@@ -42,6 +42,9 @@ for event, elem in context:
                 #I search for the creation date 
                 if "CreationDate" in elem.attrib:
                     tmp = elem.attrib["CreationDate"][0:7]
+                    #if this date is the same as last, increment total. If not,
+                    #the total is 1. Once we find new max, set it to prev, and 
+                    #record the current max date.
                     if prev == tmp:
                         total += 1
                     elif prev != tmp: 
