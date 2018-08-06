@@ -14,11 +14,11 @@ junePosts = 0
 tags = ''
 cCount = 0 #number of posts tagged combinatotics 
 noFibCount = 0 # same as above, no fibonacci-numbers tag
-noFibPattern = re.compile('^(?=.*combinatorics)(?!.*fibonacci-numbers).*') #used in regex to filter fib
+#noFibPattern = re.compile('^(?=.*combinatorics)(?!.*fibonacci-numbers).*') #used in regex to filter fib
 gCount = 0 #numbe of graph-theory tagged posts
 
 # get an iterable
-context = ET.iterparse('Posts.xml', events=("start", "end"))
+context = ET.iterparse('../Posts.xml', events=("start", "end"))
 
 # turn it into an iterator
 context = iter(context)
@@ -34,9 +34,8 @@ for event, elem in context:
         if "Tags" in elem.attrib:
             if "combinatorics" in elem.attrib["Tags"]:
                 cCount += 1
-            #match combinatorics without fib-nums
-            if noFibPattern.match(elem.attrib["Tags"]):
-                noFibCount += 1
+                if "fibonacci-numbers" not in elem.attrib["Tags"]:
+                    noFibCount += 1
             if "graph-theory" in elem.attrib["Tags"]:
                 gCount += 1 
                 #I search for the creation date 
