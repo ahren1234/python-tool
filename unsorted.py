@@ -14,13 +14,12 @@ noFibCount = 0 # same as above, no fibonacci-numbers tag
 gCount = 0 #numbe of graph-theory tagged posts
 mostCommonMonth = "" #the month with most graph-theory tags
 junePosts = 0 
-monthList = []
 quarterlyData = [] #results per quarter for graph theory
 baseDate = datetime.datetime(1800, 1, 1) #hack to check if we are in the first line of xml
 dateStart = baseDate
 dateEnd = baseDate
 maxGtDate = 0 #the most common date for graph theory posts
-
+monthlyData = {}
 
 # get an iterable
 context = ET.iterparse('../Posts.xml', events=("start", "end"))
@@ -29,18 +28,6 @@ context = ET.iterparse('../Posts.xml', events=("start", "end"))
 context = iter(context)
 # get the root element, so we can iterate and delete from root as wee go
 event, root = next(context)
-
-def insertionSort(months):
-   for idx in range(1,len(months)):
-
-     current = months[idx]
-     pos = idx
-
-     while pos > 0 and months[pos-1] > current:
-         months[pos] = months[pos-1]
-         pos = pos-1
-
-     months[pos]=current
 
 for event, elem in context:
     if event == "end" and elem.tag == "row":
@@ -57,8 +44,12 @@ for event, elem in context:
                 gCount += 1 
                 #I search for the creation date 
                 if "CreationDate" in elem.attrib:
-                    tmp = elem.attrib["CreationDate"][0:7]
-                    monthList.append(tmp) #counting months 
+                    tmp = elem.attrib["CreationDate"][0:7]                    
+                    if tmp not in monthlyData:
+                        monthlyData[tmp] = 1
+                    if monthlyData[tmp] >= 1:
+                        monthlyData[tmp] += 1
+                    
                     #if first result
                     if dateStart == baseDate:
                         dateStart = datetime.datetime.strptime(tmp, "%Y-%m")
@@ -74,17 +65,11 @@ for event, elem in context:
                     #print(tmp)
         root.clear() #delete as we go... save pc from blowing up via memory overutilization
 
-#insertionsort because the list is already almost sorted. need sorted for timeseries
-insertionSort(monthList)
-
 #done with data now, just need most common month with graph-theory tags
-#
-#I can't really find how this lib handles ties with a quick search, but it seems to be lowest index. 
-#for the purposes of a test, i think it is highly unlikely for there to be a tie in 2.5GB
-#in real life, I'd handle this accordingly. 
-mostCommonMonth = Counter(monthList).most_common(1)[0]
-#this makes basically a map of date:#results
-monthlyData = Counter(monthList)
+v = list(monthlyData.values())
+k = list(monthlyData.keys())
+mostCommonMonth = k[v.index(max(v))]
+
 #calculate the starting quarter (1-4)
 q = (dateStart.month-1)//3+1
 tot = 0
@@ -93,7 +78,7 @@ tot = 0
 #but I had troule, so I did it manually. 
 #Monthlydata has the key, val pairs.. i start with first date, get the quarter, 
 #then every time the qtr changes, i add to the total for that quarter.
-for key, value in monthlyData.items():
+for key, value in m  onthlyData.items():
     date = datetime.datetime.strptime(key, "%Y-%m")
     #count qwuarterly totals until new quarter 
     if((date.month-1)//3+1 == q):
@@ -115,4 +100,4 @@ print("Posts in June 2016: " , junePosts)
 print("Posts tagged with combinatorics: " , cCount)
 print("Posts tagged with combinatorics but not fibonacci-numbers: " , noFibCount)
 print("Posts tagged wih graph-theory: " , gCount)
-print("the month with most graph-theory tags:", mostCommonMonth[0])
+print("the month with most graph-theory tags:", mostCommonMonth)
