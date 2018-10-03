@@ -74,11 +74,9 @@ mostCommonMonth = k[v.index(max(v))]
 q = (dateStart.month-1)//3+1
 tot = 0
 
-#now, I tried to find a library or a module in matploblib to plot quarterly data
-#but I had troule, so I did it manually. 
 #Monthlydata has the key, val pairs.. i start with first date, get the quarter, 
 #then every time the qtr changes, i add to the total for that quarter.
-for key, value in m  onthlyData.items():
+for key, value in monthlyData.items():
     date = datetime.datetime.strptime(key, "%Y-%m")
     #count qwuarterly totals until new quarter 
     if((date.month-1)//3+1 == q):
